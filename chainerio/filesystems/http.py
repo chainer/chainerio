@@ -1,5 +1,6 @@
 from chainerio.filesystem import FileSystem
 from chainerio.io import open_wrapper
+from chainerio.profiler import profiling_decorator
 
 import io
 import sys
@@ -12,6 +13,7 @@ class HttpFileSystem(FileSystem):
         self.type = "url"
         self.url = None
 
+    @profiling_decorator
     @open_wrapper
     def open(self, url, mode='rb',
              buffering=-1, encoding=None, errors=None,
@@ -26,9 +28,11 @@ class HttpFileSystem(FileSystem):
 
         return url_request
 
+    @profiling_decorator
     def close(self):
         pass
 
+    @profiling_decorator
     def info(self):
         # this is a place holder
         info_str = 'Http file system'
@@ -36,29 +40,37 @@ class HttpFileSystem(FileSystem):
             info_str += ', the URL is {}'.format(self.url)
         return info_str
 
+    @profiling_decorator
     def list(self, path_or_prefix: str = None):
         raise io.UnsupportedOperation("http filesystem does not support list")
 
+    @profiling_decorator
     def stat(self, path):
         raise io.UnsupportedOperation("http filesystem does not support stat")
 
+    @profiling_decorator
     def isdir(self, file_path: str):
         raise io.UnsupportedOperation("http filesystem does not support isdir")
 
+    @profiling_decorator
     def mkdir(self, file_path: str, mode=0o777, *args, dir_fd=None):
         raise io.UnsupportedOperation("http filesystem does not support mkdir")
 
+    @profiling_decorator
     def makedirs(self, file_path: str, mode=0o777, exist_ok=False):
         raise io.UnsupportedOperation(
             "http filesystem does not support makedirs")
 
+    @profiling_decorator
     def exists(self, file_path: str):
         raise io.UnsupportedOperation(
             "http filesystem does not support exists")
 
+    @profiling_decorator
     def __enter__(self):
         return self
 
+    @profiling_decorator
     def __exit__(self, exc_type, exc_value, traceback):
         pass
 
@@ -68,8 +80,10 @@ class HttpFileSystem(FileSystem):
     def write(self, url, content, mode='wb'):
         raise io.UnsupportedOperation
 
+    @profiling_decorator
     def rename(self, src, dst):
         raise io.UnsupportedOperation
 
+    @profiling_decorator
     def remove(self, file_path, recursive=False):
         raise io.UnsupportedOperation

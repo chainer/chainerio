@@ -1,4 +1,7 @@
-from chainerio._context import DefaultContext
+from chainerio._context import context
+from chainerio._context import using_config  # NOQA
+from chainerio._context import profiling  # NOQA
+from chainerio._context import dump_profile  # NOQA
 from chainerio.version import __version__  # NOQA
 
 from chainerio.io import IO
@@ -6,14 +9,9 @@ from typing import Optional, Iterator, Any, Callable
 
 from chainerio.fileobject import FileObject
 
-_DEFAULT_CONTEXT = DefaultContext()
-
 
 def open_as_container(path: str) -> IO:
-    global _DEFAULT_CONTEXT
-    default_context = _DEFAULT_CONTEXT
-
-    return default_context.open_as_container(path)
+    return context.open_as_container(path)
 
 
 def list(path_or_prefix: Optional[str] = None) -> Iterator:
@@ -29,21 +27,15 @@ def list(path_or_prefix: Optional[str] = None) -> Iterator:
     then it shows all the files that start with `path_or_prefix`
     """
 
-    global _DEFAULT_CONTEXT
-    default_context = _DEFAULT_CONTEXT
-
     if None is path_or_prefix:
         path_or_prefix = ""
 
-    (handler, actual_path) = default_context.get_handler(path_or_prefix)
+    (handler, actual_path) = context.get_handler(path_or_prefix)
     return handler.list(actual_path)
 
 
 def info() -> str:
-    global _DEFAULT_CONTEXT
-    default_context = _DEFAULT_CONTEXT
-
-    (handler, dummy_path) = default_context.get_handler()
+    (handler, dummy_path) = context.get_handler()
     return handler.info()
 
 
@@ -53,76 +45,52 @@ def open(file_path: str, mode: str = 'rb',
          closefd: bool = True,
          opener: Optional[Callable[
              [str, int], Any]] = None) -> FileObject:
-    global _DEFAULT_CONTEXT
-    default_context = _DEFAULT_CONTEXT
-
-    (handler, actual_path) = default_context.get_handler(file_path)
+    (handler, actual_path) = context.get_handler(file_path)
     return handler.open(
         actual_path, mode, buffering, encoding,
         errors, newline, closefd, opener)
 
 
 def set_root(uri_or_handler: str) -> None:
-    global _DEFAULT_CONTEXT
-    default_context = _DEFAULT_CONTEXT
-
-    default_context.set_root(uri_or_handler)
+    context.set_root(uri_or_handler)
 
 
 def create_handler(uri: str) -> IO:
-    global _DEFAULT_CONTEXT
-    default_context = _DEFAULT_CONTEXT
-
     (handler, actual_path, is_URI) = \
-        default_context.get_handler_by_name(uri)
+        context.get_handler_by_name(uri)
     return handler
 
 
 def isdir(file_path: str) -> bool:
-    global _DEFAULT_CONTEXT
-    default_context = _DEFAULT_CONTEXT
-
     (handler, actual_path, is_URI) = \
-        default_context.get_handler_by_name(file_path)
+        context.get_handler_by_name(file_path)
     return handler.isdir(actual_path)
 
 
 def mkdir(file_path: str, mode: int = 0o777, **kwargs) -> None:
-    global _DEFAULT_CONTEXT
-    default_context = _DEFAULT_CONTEXT
-
     (handler, actual_path, is_URI) = \
-        default_context.get_handler_by_name(file_path)
+        context.get_handler_by_name(file_path)
     return handler.mkdir(actual_path, mode, *kwargs)
 
 
 def makedirs(file_path: str, mode: int = 0o777,
              exist_ok: bool = False) -> None:
-    global _DEFAULT_CONTEXT
-    default_context = _DEFAULT_CONTEXT
-
     (handler, actual_path, is_URI) = \
-        default_context.get_handler_by_name(file_path)
+        context.get_handler_by_name(file_path)
     return handler.makedirs(actual_path, mode, exist_ok)
 
 
 def exists(file_path: str) -> bool:
-    global _DEFAULT_CONTEXT
-    default_context = _DEFAULT_CONTEXT
-
     (handler, actual_path, is_URI) = \
-        default_context.get_handler_by_name(file_path)
+        context.get_handler_by_name(file_path)
     return handler.exists(actual_path)
 
 
 def rename(src: str, dst: str) -> None:
-    global _DEFAULT_CONTEXT
-    default_context = _DEFAULT_CONTEXT
-
     (handler_src, actual_src, _is_URI1) = \
-        default_context.get_handler_by_name(src)
+        context.get_handler_by_name(src)
     (handler_dst, actual_dst, _is_URI2) = \
-        default_context.get_handler_by_name(dst)
+        context.get_handler_by_name(dst)
     # TODO: containers are not supported here
     if type(handler_src) != type(handler_dst):
         raise NotImplementedError(
@@ -131,16 +99,10 @@ def rename(src: str, dst: str) -> None:
 
 
 def remove(path: str, recursive: bool = False) -> None:
-    global _DEFAULT_CONTEXT
-    default_context = _DEFAULT_CONTEXT
-
     (handler, actual_path, is_URI) = \
-        default_context.get_handler_by_name(path)
+        context.get_handler_by_name(path)
     return handler.remove(actual_path, recursive)
 
 
 def get_root_dir() -> str:
-    global _DEFAULT_CONTEXT
-    default_context = _DEFAULT_CONTEXT
-
-    return default_context.get_root_dir()
+    return context.get_root_dir()
